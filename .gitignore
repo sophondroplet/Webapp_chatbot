@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+.vite/
+build/
+.gradio
+__pychache__
+
+# Environment
+.env
+.env.local
+.env.*.local
+.venv/
+
+# Logs
+npm-debug.log*
+
+# Editor/IDE
+.idea
+.vscode
