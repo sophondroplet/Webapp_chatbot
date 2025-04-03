@@ -1,96 +1,152 @@
 # Overview & Features
 
-This is an AI-powered chatbot app powered 
+This is an AI-powered chatbot app where the chatbot can initate conversations instead of waiting for you to prompt it
 
-# Prequistes:
+## Tech_overview for devs
 
-1) python 3.11+, if you don't have python installed, install it on the 
-2) nodejs, if you don't have python installed, install it on the 
+For developers, see [Tech_overview](README_tech_overview.md) to learn more about the techical detail of the project (which files are for what, tech stack etc.)
 
-## Backend setup (Python)
+## Prerequisites
 
-1) Navaga
+1. **Python 3.11+**: If Python is not installed, you need to install it. You can download the appropriate version from the official Python website: [Python Downloads](https://www.python.org/downloads/).
+2. **Node.js**: If Nodejs is not installed, you need to install it. Install Node.js from the official website: [Node.js Downloads](https://nodejs.org/). Node.js comes with npm (Node Package Manager), which is used for managing frontend dependencies.
 
-Set up virtual environment. Run in terminal:
+## Backend Setup (Python)
 
-```
-python -m venv .venv 
+### 1. Navigate to the backend directory
+Open your terminal and run the following command:
 
-```
-
-2) Activate the environment 
-
-```
-.venv/Scripts/activate
+```bash
+cd ./backend
 ```
 
-3) Install python packages 
+### 2. Set up a virtual environment
+Run the following command in the terminal to create a virtual environment named `.venv`:
 
+```bash
+python -m venv .venv
 ```
-python -m venv .venv 
+
+### 3. Activate the virtual environment
+
+- **On Windows** (Command Prompt or PowerShell):
+
+  ```plaintext
+  .venv\Scripts\activate
+  ```
+
+- **On Linux or macOS**:
+
+  ```bash
+  source .venv/bin/activate
+  ```
+
+### 4. Install Python packages
+
+Ensure you have a `requirements.txt` file in your backend directory. Then run:
+
+```bash
+pip install -r requirements.txt
 ```
 
-## Frontend setup
+## Frontend Setup
 
-### npm modules setup
+### 1. Navigate to the frontend directory
 
-1）cd to frotnend
-2) run npm install 
-3) 
+```bash
+cd ../frontend
+```
 
-## Environment variables setup
-1) Go to .env.example
-2) Remove chaneg the name of the file to ".env"
-3) Go to openrouter and make an account, paste in the API key
-4) (Optional) Go to lo
+### 2. Install the necessary npm modules
 
+```bash
+npm install
+```
 
-# Running the app
-To run the app, you need to start two servers: 
-1) Start the backend server 
-2) Start frontend development server (click the generates URL to see the frontend)
+## Environment Variables Setup
 
-## Start Backend Server
-1) run fastapi dev \backend\main.py
+1. Locate the `.env.example` file in your project (in the root directory).
+2. Rename the file to `.env`:
 
-## Start Frontend Server
-1) Open a new terminal 
-2) cd frontend 
-3) run npm run dev 
-4) click the url
+   ```bash
+   mv .env.example .env
+   ```
 
-## Closing the server
-1) Fro the backend, kill the terminal to close the server
-2) For the frontend, press "Ctrl+C" in the terminal to close ther server. 
-KILLING THE TERMINAL DOES NOT TERMINATE THE SERVER.
+3. Go to [OpenRouter](https://openrouter.ai/) and create an account.
+4. Paste your API key into the `.env` file.
+5. (Optional) Follow any additional steps mentioned in the original `.env.example` file.
 
+## How to Run
 
-## Things to work on
-1) Improve UI features
-    - "blueticks" to represent read messages
-    - icon on top to indicated that websocket is connected (ex. bot is online)
-    - Settings support dark mode
-    - Settings tool toggle "active" conversation mode
-    - Support custom backgrounf images/icons 
+To run the app, start two servers (backend and frontend):
 
-2) Chat history
-    - Trim chat history when it gets too long
+### 1. Start the Backend Server
 
-3) Better decision making from should_I_talk bot 
-    - Feed the a few most recent chat message history to the should_I_talk,
-    instead of the entire message 
-    - Better prompts to get better behavior 
-    - Better system prompts to get better behavior. 
-    - Have the bot's personality influence its decisions in just the right extent 
+In the root directory, run (or without \backend in the backend directory):
 
-4) Personality
-    - Customize bot personality in the UI, forwarding an update to the langraph state (need UI update)
+```bash
+fastapi dev backend\main.py
+```
 
-5) Checkpointing, threads, mutli-chat support, database management 
-    - Upgrade from in memeory checkpointing to DB checkpointing 
-    - Support mutliple chats each running with different thread-ID (need UI update)
+Here, `main` is the Python file name (usually `main.py`). 
 
-4) HUGE PORJECT: Train/finetune custom LLM models for roleplay, decision making
-    - Train a specialized model for roleplay (chatbot)
-    - Trained a specialized model for assesing conversational cues to decide wheatehr the bot should talk
+### 2. Start the Frontend Server
+
+Open a new terminal, navigate to the frontend directory, and run:
+
+```bash
+npm run dev
+```
+
+Click the generated URL in the terminal to view the frontend in your browser.
+
+## How to Stop
+
+### Backend Server
+To stop the backend server, kill the terminal.
+
+### Frontend Server
+To stop the frontend server, press `Ctrl + C` in the terminal where it is running.
+
+## How to Run Tests on the backend
+Navigate to the root directory and run:
+
+```bash
+backend.test.name_of_the_test_file_without_dot_py
+```
+
+for example:
+
+```bash
+backend.test.test_graph
+```
+
+## Future Improvements
+
+1) UI Features
+    - Add "blue ticks" to represent read messages.
+    - Display an icon on top to indicate websocket connection status (e.g., bot is online).
+    - Add support for dark mode in the settings.
+    - Implement a settings tool to toggle "active" conversation mode.
+    - Support custom background images/icons.
+
+2) Chat History
+    - Trim chat history when it becomes too long.
+
+3) Better Decision-Making from the `should_I_talk` Bot
+    - Feed only the few most recent chat messages to the `should_I_talk` function instead of the entire message.    
+    -  Use better prompts for improved behavior.
+    - Allow the bot's personality to influence its decisions appropriately.
+
+4) Personality Customization
+    - Allow UI-based bot personality customization.
+    - Forward updates to the LangGraph state (requires UI update).
+
+5) Checkpointing, Threads, Multi-Chat Support, and Database Management
+    - Upgrade from in-memory checkpointing to database checkpointing.
+    - Support multiple chats, each running with a different thread ID (requires UI update).
+
+6) Train/Finetune Custom LLM Models
+    - Train a specialized model for roleplay (chatbot).
+    - Train a specialized model for assessing conversational cues to decide whether the bot should talk.
 
