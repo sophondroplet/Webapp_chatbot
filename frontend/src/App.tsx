@@ -58,6 +58,7 @@ function App() {
       if (data.type === 'chunk') {
         setMessage_history(prev => {
           const lastMessage = prev[prev.length - 1];
+          // Only update the last message if it's from the assistant and not complete
           if (lastMessage?.type === 'assistant' && !lastMessage.isComplete) {
             const newMessages = [...prev];
             newMessages[prev.length - 1] = {
@@ -65,22 +66,24 @@ function App() {
               content: data.content
             };
             return newMessages;
-          } else {
-            return [...prev, { type: 'assistant', content: data.content, isComplete: false }];
           }
+          // Otherwise create a new message
+          return [...prev, { type: 'assistant', content: data.content, isComplete: false }];
         });
       } else if (data.type === 'complete') {
         setMessage_history(prev => {
-          const newMessages = [...prev];
-          const lastMessage = newMessages[prev.length - 1];
-          if (lastMessage?.type === 'assistant') {
+          const lastMessage = prev[prev.length - 1];
+          if (lastMessage?.type === 'assistant' && !lastMessage.isComplete) {
+            const newMessages = [...prev];
             newMessages[prev.length - 1] = {
               ...lastMessage,
               content: data.content,
               isComplete: true
             };
+            return newMessages;
           }
-          return newMessages;
+          // If there's no incomplete assistant message, create a new one
+          return [...prev, { type: 'assistant', content: data.content, isComplete: true }];
         });
       }
     };

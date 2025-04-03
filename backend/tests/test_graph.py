@@ -3,16 +3,20 @@ from __future__ import annotations as _annotations
 import asyncio
 from datetime import datetime
 from langgraph.types import Command     
-from app.agents import should_I_talk_agent
 import logfire
-from app.graph import agentic_flow
+from ..graph import agentic_flow
+import time
 
 async def main():
     config = {"configurable": {"thread_id": "1"}}
 
     stream = agentic_flow.astream(
                     {"LLM_thought_latest": {'content':'The user has summoned you, say a welcome message!',
-                                        'timestamp':datetime.now()}},
+                                            'timestamp':datetime.now()},
+                     
+                     "user_message_latest": {'content':'',
+                                            'timestamp':datetime.now()}                     
+                                            },
                     config,
                     stream_mode="custom",
                 )
@@ -23,10 +27,11 @@ async def main():
     
     stream = agentic_flow.astream(
                     Command(resume={
-                        'call_reason':'user_input',
-                        'call_content':user_input
-                    }),
-                    config,
+                            'call_reason':'LLM_thought',
+                            'call_content':"""User is online and have read your message. 
+                            He seems to be a little busy"""
+                            }),
+                    config, 
                     stream_mode="custom",
                 )
 
@@ -34,8 +39,34 @@ async def main():
     async for chunk in stream:
         print(chunk)
 
+
+    #Should return false
+    #Test what happens after
+
+    while True:
+
+        user_input = input('you: ')
+
+        print('about to send stream')
+        stream = agentic_flow.astream(
+                        Command(resume={
+                                'call_reason':'LLM_thought',
+                                'call_content':"""User is online and have read your message. 
+                                He seems to have ignored you, please send a follow up"""
+                                }),
+                        config, 
+                        stream_mode="custom",
+                    )
+        
+        async for chunk in stream:
+            print("LLM decided not to talk")
+    
+
 if __name__ == "__main__":
     asyncio.run(main())
+
+
+
 
 # 'The user has said something'
 

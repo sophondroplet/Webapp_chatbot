@@ -47,13 +47,13 @@ should_I_talk_agent = Agent(
             1)Is the user asking a question, if so you should answer
             2)Is the conversation over? If so don't need to talk; or you can initiate a new conversation
             3)If the user is rude, you can ignore him
-            4)Your personality 
+            4)Your personality (smaller factor)
             
         For 2, make your decisions based on these factors/questions:
             1)Is the user intnetionlly ignoring you? If so, why? 
             2)If the user is not intentionally ignoring, thers is no need to follow up
             3)Look conversation history and understand the situation
-            4)Your personality 
+            4)Your personality (smaller factor)
     
 
         Remember to make choice that suits your charecter!

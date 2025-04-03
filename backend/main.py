@@ -41,6 +41,9 @@ async def initialize_app():
         "messages": messages
     }
 
+
+
+
 @app.websocket("/chat/ws")
 async def websocket_endpoint(websocket: WebSocket):
     
@@ -56,7 +59,11 @@ async def websocket_endpoint(websocket: WebSocket):
     
     stream = agentic_flow.astream(
                     {"LLM_thought_latest": {'content':'The user has summoned you, say a welcome message!',
-                                            'timestamp':datetime.now()}},
+                                            'timestamp':datetime.now()},
+                     
+                     "user_message_latest": {'content':'',
+                                            'timestamp':datetime.now()}                     
+                                            },
                     config,
                     stream_mode="custom",
                 )
@@ -73,6 +80,8 @@ async def websocket_endpoint(websocket: WebSocket):
         "type": "complete",
         "content": last_chunk
     })
+
+
 
 
     # initialize timer

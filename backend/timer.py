@@ -1,4 +1,4 @@
-# orchestrator.py
+# timer.py
 import asyncio
 from datetime import datetime, timedelta
 
@@ -10,7 +10,7 @@ from .graph import agentic_flow
 
 class timer:
     def __init__(self, websocket=None, config=None):
-        self.idle_threshold = 30  # seconds
+        self.idle_threshold = 20  # seconds
         self.refresh_interval = 6  # seconds
         self.websocket = websocket
         self.config = config
@@ -24,6 +24,7 @@ class timer:
             
             if self.silence_detect(state):
                 await self.trigger_agent(state)
+                self.time_elapsed_since_last_activity = 0 #prevent value from accumulating
 
             else:
                 print(f'idle time not exceeded: {self.time_elapsed_since_last_activity}')
@@ -35,19 +36,24 @@ class timer:
         last_user_activity = state.values['user_message_latest'].get('timestamp', None)
         last_LLM_activity = state.values['LLM_thought_latest'].get('timestamp', None)
 
-        #return time since chat start with user message is null
-        if last_user_activity is None or last_LLM_activity is None:
-            print("one timestamp not present")
+        # If both timestamps are None, use init_timestamp
+        if last_user_activity is None and last_LLM_activity is None:
+            print("both timestamps not present, using init timestamp")
+            self.time_elapsed_since_last_activity = datetime.now() - self.init_timestamp
+        # If one timestamp is None, use the non-None timestamp
+        elif last_user_activity is None:
+            print("user timestamp not present")
             self.time_elapsed_since_last_activity = datetime.now() - last_LLM_activity
-
-        #return the more recent message if both are present
+        
+        elif last_LLM_activity is None:
+            print("LLM timestamp not present")
+            self.time_elapsed_since_last_activity = datetime.now() - last_user_activity
+        
         else:
             print("both timestamps present")
             latest_source = last_user_activity if last_user_activity >= last_LLM_activity else last_LLM_activity
-
             self.time_elapsed_since_last_activity = datetime.now() - latest_source
             print(self.time_elapsed_since_last_activity)
-        
         
         return (self.time_elapsed_since_last_activity) > timedelta(seconds=self.idle_threshold)
     
@@ -58,36 +64,35 @@ class timer:
         stream = agentic_flow.astream(
                 Command(resume={
                         'call_reason':'LLM_thought',
-                        'call_content':"""User is online and have read your message, 
-                                        but has left you on read"""
+                        'call_content':f"""User is online and have read your message, 
+                                        but has left you on read.
+                                        """
                         }),
                 self.config, 
                 stream_mode="custom",
             )
 
-        print(stream)
-
-        if stream is not None:
-            try:
-                last_chunk = ""  # Initialize last_chunk before the loop
-                async for chunk in stream:
-                    last_chunk = chunk  # Update last_chunk in each iteration
-                    if self.websocket:  # Check if websocket exists
-                        await self.websocket.send_json({
-                            "type": "chunk",
-                            "content": chunk + "▌"  # Add cursor indicator
-                        })
-                
-                # Send final message without cursor
-                if self.websocket:  # Check if websocket exists
-                    await self.websocket.send_json({
-                        "type": "complete",
-                        "content": last_chunk.rstrip('▌') if last_chunk else ""
+        # Check first chunk to see if LLM decided not to talk
+        async for chunk in stream:
+            if chunk == "not talking":
+                print("LLM decided not to talk")
+                # Exit without without sending anything through websocket
+            
+            # If LLM is talking, process the stream normally
+            else:
+                await self.websocket.send_json({
+                    "type": "chunk",
+                    "content": chunk
                     })
-            except Exception as e:
-                print(f"Error in stream processing: {e}")
+                
+        if chunk != "not talking":
+            
+            last_chunk = chunk.rstrip('▌') if chunk else ""
 
-        return
+            await self.websocket.send_json({
+                    "type": "complete",
+                    "content": last_chunk
+                })
 
     async def analyze_convo_context(self, messages):
         # Implement your secondary LLM analysis here
@@ -98,7 +103,7 @@ class timer:
 #run langraph
 #run UI
 
-#access state from langgraph
+#access state from langraph
 #access inputs from UI
 #monitor changes to state and inputs from the UI
 

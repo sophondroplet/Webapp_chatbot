@@ -78,6 +78,7 @@ async def LLM_call_init(state:AgentState, writer: StreamWriter):
     return {'message_history':[result.new_messages_json()]}
 
 async def wait_for_activity(state:AgentState):
+    print('waiting for activity')
     trigger = interrupt({})
     
     print(f'received command from LLM: {trigger}')
@@ -96,37 +97,60 @@ async def wait_for_activity(state:AgentState):
 async def should_talk(state:AgentState, writer: StreamWriter):
 
     #determine what triggered this function
-
     user_time = state['user_message_latest']['timestamp']
     llm_time = state['LLM_thought_latest']['timestamp']
 
-    trigger_reason = "The user has texted you a message" if user_time >= llm_time else "user has not responded yet"
+    if user_time >= llm_time:
+    
+        prompt = f"""
+        prompt type: user sent you a message
+        User's message: {state['user_message_latest']['content']}
+        Your personality:{state['chatbot_personality']}
+        """
+    
+    else:
+
+        prompt = f"""
+        prompt type: user has read you message but has not replied yet
+        your latest message: {state['LLM_thought_latest']['content']}
+        Your personality:{state['chatbot_personality']}
+        """
     
     # Format message history to be more readable
-    message_history_str = "\n".join(str(msg) for msg in state['message_history'])
+    # message_history_str = "\n".join(str(msg) for msg in state['message_history'])
     
-    prompt = f"""
-    prompt type:{trigger_reason}
-    
-    Your personality:{state['chatbot_personality']}
-    
-    Conversation history:{message_history_str}
-    """
+    message_history: list[ModelMessage] = []
 
-    result = await should_I_talk_agent.run(prompt)
+    for message_row in state['message_history']:
+        message_history.extend(ModelMessagesTypeAdapter.validate_json(message_row))
+
+    result = await should_I_talk_agent.run(prompt, message_history = message_history)
 
     print(f'decision made {result.data}')
 
     if result.data.should_I_talk:
-        next_node = 'LLM_call'  # Changed from 'LLM_Call' to match the node name in builder
-    
-    else:
-        next_node = 'wait_for_activity'
-
-    return Command(update={
+        print('talking')
+        return Command(update={
         'why_should_I_talk_latest': result.data.why_should_I_talk,
         'feeling_latest': result.data.current_feeling
-    }, goto=next_node)
+        }, goto='LLM_call')
+    
+    else:
+        print("not talking")
+        writer('not talking')
+        # Update the LLM thought timestamp when deciding not to talk
+        return Command(update={
+            'why_should_I_talk_latest': result.data.why_should_I_talk,
+            'feeling_latest': result.data.current_feeling,
+            'LLM_thought_latest': {'content': 'decided not to talk', 'timestamp': datetime.now()}
+        }, goto='wait_for_activity')
+
+# async def LLM_silence(state:AgentState, writer: StreamWriter):
+    
+#     print("not talking")
+#     writer('not talking')
+
+#     return {'message_history':[result.new_messages_json()]}
 
 async def LLM_call(state:AgentState, writer: StreamWriter): 
     message_history: list[ModelMessage] = []
