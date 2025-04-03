@@ -64,3 +64,33 @@ To run the app, you need to start two servers:
 2) For the frontend, press "Ctrl+C" in the terminal to close ther server. 
 KILLING THE TERMINAL DOES NOT TERMINATE THE SERVER.
 
+
+## Things to work on
+1) Improve UI features
+    - "blueticks" to represent read messages
+    - icon on top to indicated that websocket is connected (ex. bot is online)
+    - Settings support dark mode
+    - Settings tool toggle "active" conversation mode
+    - Support custom backgrounf images/icons 
+
+2) Chat history
+    - Trim chat history when it gets too long
+
+3) Better decision making from should_I_talk bot 
+    - Feed the a few most recent chat message history to the should_I_talk,
+    instead of the entire message 
+    - Better prompts to get better behavior 
+    - Better system prompts to get better behavior. 
+    - Have the bot's personality influence its decisions in just the right extent 
+
+4) Personality
+    - Customize bot personality in the UI, forwarding an update to the langraph state (need UI update)
+
+5) Checkpointing, threads, mutli-chat support, database management 
+    - Upgrade from in memeory checkpointing to DB checkpointing 
+    - Support mutliple chats each running with different thread-ID (need UI update)
+
+4) HUGE PORJECT: Train/finetune custom LLM models for roleplay, decision making
+    - Train a specialized model for roleplay (chatbot)
+    - Trained a specialized model for assesing conversational cues to decide wheatehr the bot should talk
+
