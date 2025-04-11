@@ -42,8 +42,6 @@ async def initialize_app():
     }
 
 
-
-
 @app.websocket("/chat/ws")
 async def websocket_endpoint(websocket: WebSocket):
     
@@ -109,17 +107,22 @@ async def websocket_endpoint(websocket: WebSocket):
 
                 # Call generator and stream each message chunk
                 async for chunk in stream:
-                    await websocket.send_json({
-                        "type": "chunk",
-                        "content": chunk + "▌"  # Add cursor indicator
-                    })
+                    if chunk == 'XXX':
+                        print("LLM decided not to talk")
+                        
+                    else:    
+                        await websocket.send_json({
+                            "type": "chunk",
+                            "content": chunk + "▌"  # Add cursor indicator
+                        })
                 
                 # Send final message without cursor
-                last_chunk = chunk.rstrip('▌') if chunk else ""
-                await websocket.send_json({
-                    "type": "complete",
-                    "content": last_chunk
-                })
+                if chunk != 'XXX':
+                    last_chunk = chunk.rstrip('▌') if chunk else ""
+                    await websocket.send_json({
+                        "type": "complete",
+                        "content": last_chunk
+                    })
 
             except Exception as e:
                 print('stream failed')

@@ -40,7 +40,8 @@ chatbot_agent = Agent(
     system_prompt = (
     f"""You are the user's girlfriend. Based on the conversation with the user, 
         respond to the user in a way that is consistent with your character.
-        Your personality is shy and busy.
+        User excessive emojis when responding to the user.
+        Your personality is caring and shy.
     """),
     )
 
@@ -105,17 +106,18 @@ async def should_talk(state:AgentState, writer: StreamWriter):
         prompt = f"""
         prompt type: user sent you a message
         User's message: {state['user_message_latest']['content']}
-        Your personality:{state['chatbot_personality']}
         """
-    
+        # Your personality:{state['chatbot_personality']}
     else:
 
         prompt = f"""
         prompt type: user has read you message but has not replied yet
-        your latest message: {state['LLM_thought_latest']['content']}
-        Your personality:{state['chatbot_personality']}
+        analyze the conversation history and decide whether to follow up or not.
+        Provide a reason for your decision and your feelings.
         """
-    
+
+        # your latest message: {state['LLM_thought_latest']['content']}
+        # Your personality:{state['chatbot_personality']}
     # Format message history to be more readable
     # message_history_str = "\n".join(str(msg) for msg in state['message_history'])
     
@@ -136,8 +138,8 @@ async def should_talk(state:AgentState, writer: StreamWriter):
         }, goto='LLM_call')
     
     else:
-        print("not talking")
-        writer('not talking')
+        print('not talking')
+        writer('XXX')
         # Update the LLM thought timestamp when deciding not to talk
         return Command(update={
             'why_should_I_talk_latest': result.data.why_should_I_talk,
@@ -171,13 +173,13 @@ async def LLM_call(state:AgentState, writer: StreamWriter):
     else:
         prompt = f"""this a your thoughts and NOT part of the dialogue: 
         
-        I have decided to text the user becase:
+        you have decided to text the user becase:
         {state['why_should_I_talk_latest']}
 
-        I am feeling:
+        you are feeling:
         {state['feeling_latest']}
 
-        My personality is:
+        your personality:
         {state['chatbot_personality']}
 
         Respond to the user based on the conversation hisstory and your thought.

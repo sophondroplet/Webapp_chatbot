@@ -74,7 +74,7 @@ class timer:
 
         # Check first chunk to see if LLM decided not to talk
         async for chunk in stream:
-            if chunk == "not talking":
+            if chunk == 'XXX':
                 print("LLM decided not to talk")
                 # Exit without without sending anything through websocket
             
@@ -85,8 +85,8 @@ class timer:
                     "content": chunk
                     })
                 
-        if chunk != "not talking":
-            
+        if chunk != 'XXX':
+            print('chunk sent')
             last_chunk = chunk.rstrip('▌') if chunk else ""
 
             await self.websocket.send_json({
@@ -94,6 +94,7 @@ class timer:
                     "content": last_chunk
                 })
 
+        print("DONE")
     async def analyze_convo_context(self, messages):
         # Implement your secondary LLM analysis here
         # Return True/False based on conversation context

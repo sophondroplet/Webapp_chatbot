@@ -4,12 +4,12 @@ This is an AI-powered chatbot app powered
 
 # Prequistes:
 
-1) python 3.11+, if you don't have python installed, install it on the 
-2) nodejs, if you don't have python installed, install it on the 
+1) python 3.11+, if you don't have python installed, install it here: 
+2) nodejs, if you don't have node installed, install it here:
 
 ## Backend setup (Python)
 
-1) Navaga
+1) Navagate 
 
 Set up virtual environment. Run in terminal:
 
@@ -65,7 +65,7 @@ To run the app, you need to start two servers:
 KILLING THE TERMINAL DOES NOT TERMINATE THE SERVER.
 
 
-## Things to work on
+## To-do
 1) Improve UI features
     - "blueticks" to represent read messages
     - icon on top to indicated that websocket is connected (ex. bot is online)
