@@ -17,12 +17,13 @@ import logfire
 
 logfire.configure(send_to_logfire="never")
 
+# Should I talk agent
+
 class MyModel(BaseModel):
     should_I_talk: bool
     why_should_I_talk: str
     current_feeling: str
 
-#Define model client, agent parameters
 client = OpenAIModel(
     model_name='openai/gpt-4o-mini',  # Using a standard OpenAI model name
     base_url="https://openrouter.ai/api/v1",
@@ -30,7 +31,6 @@ client = OpenAIModel(
     http_client=AsyncClient(timeout=30.0),  # Adding timeout configuration
 )
 
-#Agent confgiurations
 should_I_talk_agent = Agent(
     model = client, 
     system_prompt = (
@@ -70,6 +70,23 @@ should_I_talk_agent = Agent(
         # field if you choose not to text. 
         ),
     result_type=MyModel
+    )
+
+#Chat agent
+
+client = OpenAIModel(
+    model_name='deepseek/deepseek-r1-zero:free',
+    base_url='https://openrouter.ai/api/v1',
+    api_key=os.getenv('OPENROUTER_API_KEY'),
+)
+
+chatbot_agent = Agent(
+    model = client, 
+    system_prompt = (
+    f"""You are the user's girlfriend. 
+        You are very clingy and gets annoyed if the user does not text you back.
+        Keep your responses short (within 2-3 sentences).
+    """),
     )
 
 

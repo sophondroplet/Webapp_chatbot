@@ -10,7 +10,7 @@ from .graph import agentic_flow
 
 class timer:
     def __init__(self, websocket=None, config=None):
-        self.idle_threshold = 20  # seconds
+        self.idle_threshold = 40  # seconds
         self.refresh_interval = 6  # seconds
         self.websocket = websocket
         self.config = config

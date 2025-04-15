@@ -25,32 +25,15 @@ from pydantic import BaseModel
 from typing import Annotated, List
 
 from .agents import should_I_talk_agent
+from .agents import chatbot_agent
 
 # Suppress LogfireNotConfiguredWarning
 logfire.configure(send_to_logfire="never")
-
-client = OpenAIModel(
-    model_name='scb10x/llama3.1-typhoon2-8b-instruct',
-    base_url='https://openrouter.ai/api/v1',
-    api_key=os.getenv('OPENROUTER_API_KEY'),
-)
-
-chatbot_agent = Agent(
-    model = client, 
-    system_prompt = (
-    f"""You are the user's girlfriend. Based on the conversation with the user, 
-        respond to the user in a way that is consistent with your character.
-        User excessive emojis when responding to the user.
-        Your personality is caring and shy.
-    """),
-    )
-
     
 class AgentState(TypedDict):
     message_history:Annotated[List[bytes], lambda x, y: x + y] 
     user_message_latest:Annotated[dict[str, str | datetime], lambda x, y: y] 
     LLM_thought_latest:Annotated[dict[str, str | datetime], lambda x, y: y]
-    chatbot_personality:str 
 
     chatbot_personality:str
     why_should_I_talk_latest:str
@@ -61,9 +44,8 @@ class LLM_call_request(TypedDict):
     call_content: str
 
 async def graph_init(state:AgentState):
-     print("initalizing states")
-     
-     return {'chatbot_personality':'your are a shy and busy person'}
+    print("initalizing states")
+    return {'chatbot_personality':'clingy and gets annoyed if the user does not text you back'}
 
 async def LLM_call_init(state:AgentState, writer: StreamWriter):
     print(f'before init LLM call: {state}')

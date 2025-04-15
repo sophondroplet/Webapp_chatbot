@@ -10,6 +10,7 @@ from datetime import datetime
 
 app = FastAPI()
 
+# Configure CORS
 origins = ["http://localhost:5173"]
 
 app.add_middleware(
@@ -42,7 +43,7 @@ async def initialize_app():
     }
 
 
-@app.websocket("/chat/ws")
+@app.websocket("/ws/chat")
 async def websocket_endpoint(websocket: WebSocket):
     
     # Accept the websocket connection and check thread_id
@@ -78,8 +79,6 @@ async def websocket_endpoint(websocket: WebSocket):
         "type": "complete",
         "content": last_chunk
     })
-
-
 
 
     # initialize timer

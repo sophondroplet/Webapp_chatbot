@@ -41,11 +41,10 @@ function App() {
   }, []);
 
   // WebSocket connection
-
   useEffect(() => {
     if (!threadId) return;
 
-    const ws = new WebSocket('ws://localhost:8000/chat/ws');
+    const ws = new WebSocket('ws://localhost:8000/ws/chat');
     websocket.current = ws;
     
     ws.onopen = () => {
@@ -66,24 +65,23 @@ function App() {
               content: data.content
             };
             return newMessages;
+          } else {
+            return [...prev, { type: 'assistant', content: data.content, isComplete: false }];
           }
-          // Otherwise create a new message
-          return [...prev, { type: 'assistant', content: data.content, isComplete: false }];
         });
+        
       } else if (data.type === 'complete') {
         setMessage_history(prev => {
-          const lastMessage = prev[prev.length - 1];
-          if (lastMessage?.type === 'assistant' && !lastMessage.isComplete) {
             const newMessages = [...prev];
+          const lastMessage = newMessages[prev.length - 1];
+          if (lastMessage?.type === 'assistant') {
             newMessages[prev.length - 1] = {
               ...lastMessage,
               content: data.content,
               isComplete: true
             };
-            return newMessages;
           }
-          // If there's no incomplete assistant message, create a new one
-          return [...prev, { type: 'assistant', content: data.content, isComplete: true }];
+          return newMessages;
         });
       }
     };
@@ -109,7 +107,7 @@ function App() {
             onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
             className="w-full flex items-center justify-center hover:bg-gray-100 rounded-lg p-2 transition-colors"
           >
-            <FiMenu className="w-6 h-6 text-gray-600" />
+            <FiMenu className="w-6 h-6 text-gray-600"/>
           </button>
         </div>
         
